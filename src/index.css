@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-noto: "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-raleway: "Raleway", ui-sans-serif, system-ui, sans-serif;
+  --color-jira: #0052cc;
+  --color-jira-dark: #0747a6;
+  --color-ink: #172b4d;
+  --color-subtle: #6b778c;
+  --color-line: #dfe1e6;
+  --color-wise: #1f6f78;
+  --color-legacy: #2e7474;
+}
+
+html, body, #root { height: 100%; }
+body { @apply bg-white text-ink antialiased; font-family: var(--font-sans); }
+
+@keyframes slide-in { from { transform: translateY(12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.animate-slide-in { animation: slide-in .25s ease-out; }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(222,53,11,.5) } 100% { box-shadow: 0 0 0 10px rgba(222,53,11,0) } }
+.pulse-ring { animation: pulse-ring 1.4s infinite; }
