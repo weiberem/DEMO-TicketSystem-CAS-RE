@@ -71,13 +71,13 @@ export default function PortalList({ contact }: { contact: Contact }) {
           </thead>
           <tbody>
             {list.map((t) => (
-              <tr key={t.id} className="block border-t border-slate-100 px-4 py-3 hover:bg-slate-50 md:table-row md:p-0">
-                <td className="md:px-4 md:py-3">
+              <tr key={t.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 px-4 py-3 hover:bg-slate-50 md:table-row md:p-0">
+                <td className="whitespace-nowrap md:px-4 md:py-3">
                   <Link to={`/portal/ticket/${t.key}`} className="font-semibold text-[#0052CC] hover:underline">
                     {t.key}
                   </Link>
                 </td>
-                <td className="md:px-4 md:py-3">
+                <td className="order-first w-full md:order-none md:w-auto md:px-4 md:py-3">
                   <Link to={`/portal/ticket/${t.key}`} className="text-ink hover:underline">
                     {t.subject}
                   </Link>
@@ -86,11 +86,11 @@ export default function PortalList({ contact }: { contact: Contact }) {
                   </div>
                 </td>
                 <td className="hidden text-subtle md:table-cell md:px-4 md:py-3">{typeLabel(t.type)}</td>
-                <td className="inline-block pr-3 md:table-cell md:px-4 md:py-3">
+                <td className="md:table-cell md:px-4 md:py-3">
                   <PriorityLabel p={t.priority} />
                 </td>
                 <td className="hidden text-subtle md:table-cell md:px-4 md:py-3">{fmtDate(t.createdAt)}</td>
-                <td className="inline-block md:table-cell md:px-4 md:py-3">
+                <td className="md:table-cell md:px-4 md:py-3">
                   <StatusLozenge status={t.status} customer />
                 </td>
               </tr>
