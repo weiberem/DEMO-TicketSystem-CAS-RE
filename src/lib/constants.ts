@@ -1,17 +1,16 @@
-import type { Agent, Contact, Customer, Priority, RequestType, Status, BillingStatus, Channel } from './types'
+import type { Agent, Contact, Customer, Priority, RequestType, Status, Channel } from './types'
 
 export const HOTLINE = '+41 33 334 10 20'
 export const SUPPORT_MAIL = 'support@timetool.ch'
 export const SERVICE_HOURS = 'Mo–Do 09:00–11:00 und 14:00–16:00 · Fr 09:00–11:00'
 
-// Stammdaten (fiktiv). Die Kunden liegen zusätzlich als bearbeitbare Datensätze im Speicher,
-// damit der Stundensatz pro Kunde in einer Tabelle gepflegt werden kann.
+// Stammdaten (fiktiv). Die Kunden liegen zusätzlich als Datensätze im Speicher.
 export const SEED_CUSTOMERS: Customer[] = [
-  { id: 'c-buehler', nr: '1042', name: 'Bühler AG', rate: 200, contract: 'Standard-Supportvertrag', city: 'Thun' },
-  { id: 'c-meier', nr: '1187', name: 'Meier Transport AG', rate: 200, contract: 'Standard-Supportvertrag', city: 'Bern' },
-  { id: 'c-roth', nr: '1203', name: 'Roth Bau GmbH', rate: 200, contract: 'Standard-Supportvertrag', city: 'Biel' },
-  { id: 'c-sebi', nr: '0815', name: 'Sebi-Sport AG', rate: 180, contract: 'Spezialvertrag (Altkunde seit 2009)', city: 'Spiez' },
-  { id: 'c-keller', nr: '1311', name: 'Keller Gastro AG', rate: 195, contract: 'Rahmenvertrag 2022', city: 'Interlaken' },
+  { id: 'c-buehler', nr: '1042', name: 'Bühler AG', contract: 'Standard-Supportvertrag', city: 'Thun' },
+  { id: 'c-meier', nr: '1187', name: 'Meier Transport AG', contract: 'Standard-Supportvertrag', city: 'Bern' },
+  { id: 'c-roth', nr: '1203', name: 'Roth Bau GmbH', contract: 'Standard-Supportvertrag', city: 'Biel' },
+  { id: 'c-sebi', nr: '0815', name: 'Sebi-Sport AG', contract: 'Supportvertrag (Kunde seit 2009)', city: 'Spiez' },
+  { id: 'c-keller', nr: '1311', name: 'Keller Gastro AG', contract: 'Standard-Supportvertrag', city: 'Interlaken' },
 ]
 
 export const CONTACTS: Contact[] = [
@@ -98,13 +97,6 @@ export const STATUS_META: Record<Status, { label: string; customer: string; bg: 
   geschlossen: { label: 'Geschlossen', customer: 'Erledigt', bg: '#E3FCEF', fg: '#006644' },
 }
 
-export const BILLING_META: Record<BillingStatus, { label: string; bg: string; fg: string }> = {
-  offen: { label: 'Offen', bg: '#DFE1E6', fg: '#42526E' },
-  verrechenbar: { label: 'Verrechenbar', bg: '#E3FCEF', fg: '#006644' },
-  nicht_verrechenbar: { label: 'Nicht verrechenbar', bg: '#FFEBE6', fg: '#BF2600' },
-  uebermittelt: { label: 'An Buchhaltung übermittelt', bg: '#DEEBFF', fg: '#0747A6' },
-}
-
 export const CHANNEL_LABEL: Record<Channel, string> = {
   portal: 'Kundenportal',
   email: 'E-Mail → automatisch verknüpft',
@@ -127,7 +119,7 @@ export const PAIN_POINTS: Record<string, string> = {
   PP13: 'Bei Abwesenheit bleibt Rückmeldung in persönlicher Inbox liegen',
   PP14: 'Automatische Korrektur von Texten fehlt',
   PP15: 'Keine mobile Version',
-  PP16: 'Kein Dashboard zur Verrechnung (Ziel 75 %)',
+  PP16: 'Kein Dashboard zur Verrechnung (Ziel 75 %) – Verrechnung out of scope',
   PP17: 'Keine Auto-Aktualisierung, Benachrichtigungen erst nach Reload',
   PP18: 'Kein Tagging weiterer Personen im Team',
 }

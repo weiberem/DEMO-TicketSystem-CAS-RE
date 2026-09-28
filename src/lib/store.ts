@@ -118,6 +118,10 @@ const SB_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY ||
   import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) as string | undefined
 
+/** Datenversion: ältere Stände (z. B. mit Verrechnungsfeldern) werden neu angelegt. */
+export const DATA_VERSION = 2
+const isCurrent = (all: Rec[]) => all.some((r) => r.kind === 'meta' && ((r.data as { version?: number }).version ?? 0) >= DATA_VERSION)
+
 class Store {
   private recs = new Map<string, Rec>()
   private listeners = new Set<() => void>()
@@ -158,7 +162,8 @@ class Store {
   async init() {
     try {
       let all = await this.backend.loadAll()
-      if (!all.some((r) => r.kind === 'meta')) {
+      if (!isCurrent(all)) {
+        await this.backend.clear()
         all = buildSeed()
         await this.backend.put(all)
       }

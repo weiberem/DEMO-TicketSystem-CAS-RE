@@ -1,6 +1,6 @@
 import { Paperclip } from 'lucide-react'
 import type { Attachment, Priority, Status, Ticket } from '../lib/types'
-import { PRIORITY_META, STATUS_META, BILLING_META } from '../lib/constants'
+import { PRIORITY_META, STATUS_META } from '../lib/constants'
 import { Lozenge, fmtSize } from './ui'
 import { slaState } from '../lib/sla'
 
@@ -9,15 +9,6 @@ export function StatusLozenge({ status, customer = false }: { status: Status; cu
   return (
     <Lozenge bg={m.bg} fg={m.fg}>
       {customer ? m.customer : m.label}
-    </Lozenge>
-  )
-}
-
-export function BillingLozenge({ billing }: { billing: Ticket['billing'] }) {
-  const m = BILLING_META[billing]
-  return (
-    <Lozenge bg={m.bg} fg={m.fg} className="normal-case tracking-normal">
-      {m.label}
     </Lozenge>
   )
 }

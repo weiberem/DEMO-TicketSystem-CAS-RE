@@ -89,9 +89,9 @@ export default function Desk() {
         <SideLink key={x.id} to={`/desk/queue/${x.id}`} count={counts[x.id]} label={x.label} />
       ))}
       <SideHead>Reports</SideHead>
-      <SideLink to="/desk/reports" label="Zeit, SLA & Leistungsdaten" />
+      <SideLink to="/desk/reports" label="Zeit & SLA" />
       <SideHead>Einstellungen</SideHead>
-      <SideLink to="/desk/kunden" label="Kunden, Tarife & Team" />
+      <SideLink to="/desk/kunden" label="Kunden & Team" />
     </nav>
   )
 

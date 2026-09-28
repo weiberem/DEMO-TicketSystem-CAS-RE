@@ -86,20 +86,20 @@ const SOLL: DemoCard[] = [
     kicker: 'Soll-Prozess · Support-Sicht',
     who: 'Folie 10 / 15 · Rémy',
     icon: <Headset size={20} />,
-    desc: 'Eine Queue für Portal, E-Mail und Telefon, SLA-Uhr pro Ticket, Zuweisung an Person oder Team, Eskalation mit Grund, @-Markierung, Zeiterfassung mit Kundentarif, Ticket lösen mit Kundenbestätigung, Reports und Leistungsdaten.',
-    pps: ['PP06', 'PP07', 'PP09', 'PP11', 'PP12', 'PP13', 'PP14', 'PP16', 'PP17', 'PP18'],
+    desc: 'Eine Queue für Portal, E-Mail und Telefon, SLA-Uhr pro Ticket, Zuweisung an Person oder Team, Eskalation mit Grund, @-Markierung, Zeiterfassung, Ticket lösen mit Kundenbestätigung und Reports zu Zeit und SLA.',
+    pps: ['PP06', 'PP07', 'PP09', 'PP11', 'PP12', 'PP13', 'PP14', 'PP17', 'PP18'],
     steps: [
       'Queue «Alle offenen Tickets»: sortiert nach Priorität, SLA-Uhr läuft',
       'Neues Ticket (aus dem Portal) «Mir zuweisen» → antworten → SLA erfüllt',
       'TS-1041 an Second Level eskalieren (Grund) · @L. Hebeisen markieren',
-      'TS-1034 Sebi-Sport: Zeit erfassen → Tarif CHF 180 automatisch',
-      '«Ticket lösen» → Lösung, Zeitaufwand, Status für Buchhaltung',
-      'Reports → Leistungsdaten an Buchhaltung übermitteln',
+      'TS-1034: Zeitaufwand erfassen, interne Notiz mit @-Markierung',
+      '«Ticket lösen» (Use Case 03) → Lösung an Kunde, Zeitaufwand erfasst',
+      'Portal: Kunde bestätigt oder eröffnet wieder · Reports → Zeit & SLA',
     ],
     extra: [
       { to: '/desk/queue/second', label: 'Second Level' },
       { to: '/desk/reports', label: 'Reports' },
-      { to: '/desk/kunden', label: 'Tarife & Team' },
+      { to: '/desk/kunden', label: 'Kunden & Team' },
     ],
   },
 ]
@@ -217,7 +217,7 @@ export default function Hub() {
               <p className="mt-2 text-[12px] text-[#5A6570]">Tipp: Kurz vor der Präsentation zurücksetzen, damit die SLA-Uhren der Beispieltickets realistisch laufen.</p>
             </div>
             <div className="rounded-lg border border-[#DDE3E7] bg-white p-5 text-[13px] text-[#5A6570]">
-              <b className="text-[#1A1A1A]">Abgrenzung:</b> Verrechnung bleibt ausserhalb des Systems – Leistungsdaten gehen über eine Schnittstelle an die Buchhaltung. Direktzuweisung an Fachverantwortliche: Entscheid der Geschäftsleitung. Alle Namen, Kunden und Tickets sind fiktiv.
+              <b className="text-[#1A1A1A]">Abgrenzung:</b> Verrechnung und Stundensätze sind bewusst out of scope und nicht Teil des Prototyps. Direktzuweisung an Fachverantwortliche: Entscheid der Geschäftsleitung. Alle Namen, Kunden und Tickets sind fiktiv.
             </div>
           </div>
         </section>

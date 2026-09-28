@@ -50,10 +50,10 @@ export const SCENARIOS: Scenario[] = [
     soll: { text: 'Das Ticket wird wiedereröffnet. Ist die zuständige Person abwesend (J. Gómez, Ferien), landet es in der Team-Queue. Benachrichtigungen lassen sich als ungelesen markieren.', to: '/split?l=%2Fportal%2Fticket%2FTS-1021%3Fas%3Dp-brunner&r=%2Fdesk%2Fqueue%2Frueckmeldung', label: 'Portal ↔ Queue' },
   },
   {
-    title: 'Zeitaufwand, Stundensatz und Buchhaltung',
-    pps: ['PP16'],
-    ist: { text: 'Spent Time mit Standardsatz CHF 200 – bei Sebi-Sport muss man wissen, dass CHF 180 gilt. Status «Closed, unbilled» manuell setzen.', to: '/ist/wise/ticket/24482', label: 'WISE Spent Time' },
-    soll: { text: 'Tariftabelle pro Kunde, Betrag automatisch. «Ticket lösen» (Use Case 03) mit Kundenbestätigung, Leistungsdaten als Export an die Buchhaltung.', to: '/desk/reports', label: 'Reports · Leistungsdaten' },
+    title: 'Ticket abschliessen (Use Case 03)',
+    pps: ['PP12'],
+    ist: { text: 'Ticket per Status «Closed» abschliessen – der Kunde wird nicht gefragt, ob das Problem gelöst ist.', to: '/ist/wise/ticket/24482', label: 'WISE #24482' },
+    soll: { text: '«Ticket lösen»: Lösung an den Kunden, Zeitaufwand erfasst, Kunde bestätigt im Portal – sonst automatische Wiedereröffnung. Verrechnung ist out of scope.', to: '/portal/ticket/TS-1033?as=p-keller', label: 'TS-1033 bestätigen' },
   },
   {
     title: 'Performance und Zusammenarbeit',

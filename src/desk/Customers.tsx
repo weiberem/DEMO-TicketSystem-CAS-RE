@@ -1,10 +1,8 @@
-import { useState } from 'react'
-import { Plane, Save } from 'lucide-react'
+import { Plane } from 'lucide-react'
 import { AGENTS, CONTACTS } from '../lib/constants'
-import type { Customer } from '../lib/types'
-import { getAgentStatus, getCustomers, setAbsent, updateCustomer } from '../lib/actions'
+import { getAgentStatus, getCustomers, setAbsent } from '../lib/actions'
 import { useData } from '../lib/store'
-import { Avatar, DiffNote, PP, toast } from '../components/ui'
+import { Avatar, PP, toast } from '../components/ui'
 
 export default function Customers() {
   const customers = useData(() => getCustomers())
@@ -12,35 +10,39 @@ export default function Customers() {
   return (
     <div className="max-w-[1100px] px-4 py-5 sm:px-8 sm:py-6">
       <div className="text-[13.5px] text-subtle">Projekte / TimeTool Kundensupport / Einstellungen</div>
-      <h1 className="mt-1 text-[26px] font-semibold">Kunden, Tarife & Team</h1>
+      <h1 className="mt-1 text-[26px] font-semibold">Kunden & Team</h1>
 
       <section className="mt-5">
-        <h2 className="mb-1 text-[17px] font-semibold">
-          Tariftabelle pro Kunde <PP ids={['PP16']} />
-        </h2>
-        <p className="mb-3 text-[13.5px] text-subtle">Der Stundensatz wird bei jeder Zeiterfassung automatisch übernommen und mit der Arbeitszeit multipliziert.</p>
+        <h2 className="mb-1 text-[17px] font-semibold">Kunden</h2>
+        <p className="mb-3 text-[13.5px] text-subtle">Nur die hinterlegten HR-Ansprechpersonen können Tickets im Kundenportal erfassen.</p>
         <div className="overflow-x-auto rounded-md border border-line">
-          <table className="w-full min-w-[760px] text-left text-[14px]">
+          <table className="w-full min-w-[640px] text-left text-[14px]">
             <thead className="border-b-2 border-line bg-[#FAFBFC] text-[11.5px] font-bold tracking-wide text-subtle uppercase">
               <tr>
                 <th className="px-4 py-2.5">Kd.-Nr.</th>
                 <th className="px-3 py-2.5">Kunde</th>
+                <th className="px-3 py-2.5">Ort</th>
                 <th className="px-3 py-2.5">HR-Ansprechperson(en)</th>
                 <th className="px-3 py-2.5">Vertrag</th>
-                <th className="px-3 py-2.5">Stundensatz CHF</th>
-                <th className="px-3 py-2.5" />
               </tr>
             </thead>
             <tbody>
               {customers.map((c) => (
-                <CustomerRow key={c.id + c.rate + c.contract} c={c} />
+                <tr key={c.id} className="border-b border-line">
+                  <td className="px-4 py-2.5 font-mono text-[13px]">{c.nr}</td>
+                  <td className="px-3 py-2.5 font-medium">{c.name}</td>
+                  <td className="px-3 py-2.5 text-subtle">{c.city}</td>
+                  <td className="px-3 py-2.5 text-[13px]">
+                    {CONTACTS.filter((p) => p.customerId === c.id && p.role === 'HR' && p.active)
+                      .map((p) => p.name)
+                      .join(', ')}
+                  </td>
+                  <td className="px-3 py-2.5 text-[13px] text-subtle">{c.contract}</td>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <DiffNote kind="pain" ids={['PP16']} className="mt-3 max-w-3xl">
-          Ist-Zustand: «Bei Sebi-Sport gilt noch der alte Stundensatz von CHF 180.– – das musst du manuell erfassen.» Dieses Wissen steht heute nirgends im System.
-        </DiffNote>
       </section>
 
       <section className="mt-8">
@@ -81,37 +83,5 @@ export default function Customers() {
         </div>
       </section>
     </div>
-  )
-}
-
-function CustomerRow({ c }: { c: Customer }) {
-  const [rate, setRate] = useState(String(c.rate))
-  const [contract, setContract] = useState(c.contract)
-  const dirty = Number(rate) !== c.rate || contract !== c.contract
-  const hr = CONTACTS.filter((p) => p.customerId === c.id && p.role === 'HR' && p.active)
-  return (
-    <tr className={`border-b border-line ${c.rate !== 200 ? 'bg-[#FFFAE6]' : ''}`}>
-      <td className="px-4 py-2.5 font-mono text-[13px]">{c.nr}</td>
-      <td className="px-3 py-2.5 font-medium">{c.name}</td>
-      <td className="px-3 py-2.5 text-[13px] text-subtle">{hr.map((p) => p.name).join(', ')}</td>
-      <td className="px-3 py-2.5">
-        <input value={contract} onChange={(e) => setContract(e.target.value)} className="w-full rounded-[3px] border-2 border-transparent bg-transparent px-1.5 py-1 hover:bg-[#EBECF0] focus:border-[#4C9AFF] focus:bg-white" />
-      </td>
-      <td className="px-3 py-2.5">
-        <input type="number" value={rate} onChange={(e) => setRate(e.target.value)} className="w-24 rounded-[3px] border-2 border-line bg-white px-2 py-1 text-right font-semibold" />
-      </td>
-      <td className="px-3 py-2.5 text-right">
-        <button
-          disabled={!dirty || !(Number(rate) > 0)}
-          onClick={() => {
-            updateCustomer({ ...c, rate: Number(rate), contract })
-            toast(`Tarif ${c.name}: CHF ${rate}.–/h gespeichert.`, 'success')
-          }}
-          className="inline-flex items-center gap-1 rounded-[3px] bg-[#0052CC] px-3 py-1 text-[13px] font-semibold text-white disabled:bg-slate-200 disabled:text-slate-400"
-        >
-          <Save size={13} /> Speichern
-        </button>
-      </td>
-    </tr>
   )
 }

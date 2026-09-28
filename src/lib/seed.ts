@@ -34,11 +34,7 @@ interface SeedTicket extends Omit<Ticket, 'id' | 'key' | 'attachments' | 'reopen
   attachments?: Ticket['attachments']
   reopenedCount?: number
   events?: Omit<TicketEvent, 'id' | 'ticketId'>[]
-  time?: Omit<TimeEntry, 'id' | 'ticketId' | 'rate'>[]
-}
-
-function rateOf(customerId: string) {
-  return SEED_CUSTOMERS.find((c) => c.id === customerId)!.rate
+  time?: Omit<TimeEntry, 'id' | 'ticketId'>[]
 }
 
 export function buildSeed(): Rec[] {
@@ -63,14 +59,13 @@ export function buildSeed(): Rec[] {
       assigneeId: 'rw',
       phoneConfirmed: true,
       createdAt: at(2 * H + 12),
-      billing: 'offen',
       events: [
         { at: at(2 * H + 12), kind: 'created', actor: cust('p-brunner'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(2 * H + 12), kind: 'system', actor: sys, public: true, text: `Hinweis angezeigt: Priorität «Hoch» – bitte zusätzlich telefonisch melden (${HOTLINE}).` },
         { at: at(2 * H + 2), kind: 'note', actor: ag('rw'), public: false, text: 'Kundin hat telefonisch über die Hotline bestätigt. Übernehme das Ticket.' },
         { at: at(2 * H + 1), kind: 'assign', actor: ag('rw'), public: false, text: 'Zugewiesen an R. Weibel' },
       ],
-      time: [{ agentId: 'rw', minutes: 25, note: 'Analyse Logfiles Update', at: at(90), billable: true }],
+      time: [{ agentId: 'rw', minutes: 25, note: 'Analyse Logfiles Update', at: at(90) }],
     },
     {
       number: 1041,
@@ -88,7 +83,6 @@ export function buildSeed(): Rec[] {
       team: 'first',
       assigneeId: null,
       createdAt: at(86),
-      billing: 'offen',
       events: [
         { at: at(86), kind: 'created', actor: cust('p-meier'), public: true, via: 'email', text: 'E-Mail an support@timetool.ch – automatisch mit Kunde Meier Transport AG verknüpft.' },
       ],
@@ -108,12 +102,11 @@ export function buildSeed(): Rec[] {
       assigneeId: 'sw',
       createdAt: at(D - 3 * H - 20),
       firstResponseAt: at(D - 4 * H),
-      billing: 'offen',
       events: [
         { at: at(D - 3 * H - 20), kind: 'created', actor: cust('p-roth'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(D - 4 * H), kind: 'reply_agent', actor: ag('sw'), public: true, text: 'Guten Tag Frau Roth\n\nVielen Dank, wir richten den Zugang ein und melden uns, sobald er bereit ist.\n\nFreundliche Grüsse\nSebastian Wright' },
       ],
-      time: [{ agentId: 'sw', minutes: 15, note: 'Benutzer angelegt', at: at(D - 5 * H), billable: true }],
+      time: [{ agentId: 'sw', minutes: 15, note: 'Benutzer angelegt', at: at(D - 5 * H) }],
     },
     {
       number: 1039,
@@ -130,7 +123,6 @@ export function buildSeed(): Rec[] {
       assigneeId: 'jg',
       createdAt: at(2 * D + 3 * H),
       firstResponseAt: at(2 * D),
-      billing: 'offen',
       events: [
         { at: at(2 * D + 3 * H), kind: 'created', actor: cust('p-brunner'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(2 * D), kind: 'reply_agent', actor: ag('jg'), public: true, text: 'Guten Tag Frau Brunner\n\nKönnen Sie uns bitte einen Screenshot der Rapport-Einstellungen senden (Reporting → Monatsrapport → Layout)? Dann können wir die Spalte gezielt wieder einblenden.\n\nFreundliche Grüsse\nJosé Gómez' },
@@ -153,7 +145,6 @@ export function buildSeed(): Rec[] {
       escalationReason: 'Benötigt Entwickler-Analyse: Timeout in der Exportschnittstelle, im First Level nicht reproduzierbar.',
       createdAt: at(D + 5 * H),
       firstResponseAt: at(D + 3 * H),
-      billing: 'offen',
       events: [
         { at: at(D + 5 * H), kind: 'created', actor: cust('p-roth'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(D + 3 * H), kind: 'reply_agent', actor: ag('sw'), public: true, text: 'Guten Tag Frau Roth\n\nWir analysieren die Logfiles der letzten Exportläufe und melden uns.\n\nFreundliche Grüsse\nSebastian Wright' },
@@ -161,8 +152,8 @@ export function buildSeed(): Rec[] {
         { at: at(D + H), kind: 'note', actor: ag('sw'), public: false, text: '@L. Hebeisen kannst du dir das Timeout im Exportjob ansehen? Logfiles hängen an.', mentions: ['lh'] },
       ],
       time: [
-        { agentId: 'sw', minutes: 40, note: 'Analyse Logfiles Export', at: at(D + 2 * H), billable: true },
-        { agentId: 'lh', minutes: 30, note: 'Reproduktion Testsystem', at: at(3 * H), billable: true },
+        { agentId: 'sw', minutes: 40, note: 'Analyse Logfiles Export', at: at(D + 2 * H) },
+        { agentId: 'lh', minutes: 30, note: 'Reproduktion Testsystem', at: at(3 * H) },
       ],
     },
     {
@@ -179,7 +170,6 @@ export function buildSeed(): Rec[] {
       team: 'first',
       assigneeId: null,
       createdAt: at(D - 58),
-      billing: 'offen',
       events: [
         { at: at(D - 58), kind: 'created', actor: cust('p-meier'), public: true, via: 'email', text: 'E-Mail an support@timetool.ch – automatisch mit Kunde Meier Transport AG verknüpft.' },
       ],
@@ -189,20 +179,19 @@ export function buildSeed(): Rec[] {
       customerId: 'c-roth',
       contactId: 'p-roth',
       type: 'change',
-      category: 'Lizenz & Vertrag',
+      category: 'Absenzen',
       priority: 'tief',
-      subject: 'Wunsch: Sammelrechnung pro Quartal',
-      description: 'Könnten die Lizenzkosten künftig quartalsweise in einer Sammelrechnung verrechnet werden?',
+      subject: 'Wunsch: Absenzenübersicht als Excel exportieren',
+      description: 'Könnte die Absenzenübersicht pro Abteilung direkt als Excel-Datei exportiert werden?',
       status: 'warten_kunde',
       channel: 'portal',
       team: 'first',
       assigneeId: 'sw',
       createdAt: at(4 * D),
       firstResponseAt: at(3 * D),
-      billing: 'offen',
       events: [
         { at: at(4 * D), kind: 'created', actor: cust('p-roth'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
-        { at: at(3 * D), kind: 'reply_agent', actor: ag('sw'), public: true, text: 'Guten Tag Frau Roth\n\nGerne klären wir das mit unserer Buchhaltung. Ab welchem Quartal wünschen Sie die Umstellung?\n\nFreundliche Grüsse\nSebastian Wright' },
+        { at: at(3 * D), kind: 'reply_agent', actor: ag('sw'), public: true, text: 'Guten Tag Frau Roth\n\nGerne nehmen wir den Wunsch auf. Welche Spalten benötigen Sie im Export?\n\nFreundliche Grüsse\nSebastian Wright' },
       ],
     },
     {
@@ -220,7 +209,6 @@ export function buildSeed(): Rec[] {
       assigneeId: 'rw',
       createdAt: at(3 * D + 2 * H),
       firstResponseAt: at(3 * D),
-      billing: 'offen',
       events: [
         { at: at(3 * D + 2 * H), kind: 'created', actor: cust('p-brunner'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(3 * D), kind: 'reply_agent', actor: ag('rw'), public: true, text: 'Guten Tag Frau Brunner\n\nWir legen Frau Kunz als zusätzliche HR-Ansprechperson an. Sie erhält eine Einladung per E-Mail.\n\nFreundliche Grüsse\nRémy Weibel' },
@@ -241,12 +229,11 @@ export function buildSeed(): Rec[] {
       assigneeId: 'nr',
       createdAt: at(5 * H),
       firstResponseAt: at(4 * H),
-      billing: 'offen',
       events: [
         { at: at(5 * H), kind: 'created', actor: cust('p-sutter'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(4 * H), kind: 'reply_agent', actor: ag('nr'), public: true, text: 'Guten Tag Herr Sutter\n\nDanke für die Beispiele. Wir prüfen die Pro-rata-Regel im Absenzenmodul.\n\nFreundliche Grüsse\nNicole Riesen' },
       ],
-      time: [{ agentId: 'nr', minutes: 35, note: 'Analyse Saldoberechnung', at: at(3 * H), billable: true }],
+      time: [{ agentId: 'nr', minutes: 35, note: 'Analyse Saldoberechnung', at: at(3 * H) }],
     },
     {
       number: 1033,
@@ -265,14 +252,13 @@ export function buildSeed(): Rec[] {
       createdAt: at(6 * H),
       firstResponseAt: at(5 * H + 30),
       resolvedAt: at(3 * H),
-      billing: 'verrechenbar',
       events: [
         { at: at(6 * H), kind: 'created', actor: cust('p-keller'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(5 * H + 30), kind: 'reply_agent', actor: ag('nr'), public: true, text: 'Guten Tag Frau Keller\n\nWir verbinden uns per Fernwartung mit dem Terminal.\n\nFreundliche Grüsse\nNicole Riesen' },
         { at: at(3 * H), kind: 'reply_agent', actor: ag('nr'), public: true, text: 'Lösung: Der Badge-Leser hatte nach einem Stromunterbruch keine Netzwerkadresse mehr. Wir haben die Konfiguration neu geladen – das Terminal ist wieder online und die Buchungen wurden nachsynchronisiert.\n\nBitte bestätigen Sie im Portal, ob das Problem gelöst ist.' },
         { at: at(3 * H), kind: 'status', actor: ag('nr'), public: true, text: 'Status: In Arbeit → Gelöst (wartet auf Bestätigung durch Kundin)' },
       ],
-      time: [{ agentId: 'nr', minutes: 45, note: 'Fernwartung Terminal, Konfiguration neu geladen', at: at(3 * H), billable: true }],
+      time: [{ agentId: 'nr', minutes: 45, note: 'Fernwartung Terminal, Konfiguration neu geladen', at: at(3 * H) }],
     },
     {
       number: 1030,
@@ -292,7 +278,6 @@ export function buildSeed(): Rec[] {
       firstResponseAt: at(23 * D - 3 * H),
       resolvedAt: at(21 * D),
       closedAt: at(20 * D),
-      billing: 'verrechenbar',
       events: [
         { at: at(23 * D), kind: 'created', actor: cust('p-sutter'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(23 * D - 3 * H), kind: 'reply_agent', actor: ag('nr'), public: true, text: 'Guten Tag Herr Sutter\n\nGerne richten wir eine Testinstanz ein. Diese ist bis Ende Monat verfügbar.\n\nFreundliche Grüsse\nNicole Riesen' },
@@ -302,8 +287,8 @@ export function buildSeed(): Rec[] {
         { at: at(20 * D), kind: 'feedback', actor: cust('p-sutter'), public: true, text: 'Kunde ist mit der Lösung einverstanden – Ticket geschlossen.' },
       ],
       time: [
-        { agentId: 'nr', minutes: 60, note: 'Testinstanz eingerichtet', at: at(22 * D), billable: true },
-        { agentId: 'nr', minutes: 30, note: 'Instruktion Kunde', at: at(21 * D), billable: true },
+        { agentId: 'nr', minutes: 60, note: 'Testinstanz eingerichtet', at: at(22 * D) },
+        { agentId: 'nr', minutes: 30, note: 'Instruktion Kunde', at: at(21 * D) },
       ],
     },
     {
@@ -323,13 +308,12 @@ export function buildSeed(): Rec[] {
       firstResponseAt: at(12 * D - 2 * H),
       resolvedAt: at(12 * D - 2 * H),
       closedAt: at(11 * D),
-      billing: 'nicht_verrechenbar',
       events: [
         { at: at(12 * D), kind: 'created', actor: cust('p-meier'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(12 * D - 2 * H), kind: 'reply_agent', actor: ag('sw'), public: true, text: 'Lösung: PEP → Vorlagen → Rechtsklick «Duplizieren». Anleitung siehe Knowledge Base Artikel KB-112.' },
         { at: at(11 * D), kind: 'feedback', actor: cust('p-meier'), public: true, text: 'Kunde ist mit der Lösung einverstanden – Ticket geschlossen.' },
       ],
-      time: [{ agentId: 'sw', minutes: 15, note: 'Kurze Instruktion (Kulanz)', at: at(12 * D - 2 * H), billable: false }],
+      time: [{ agentId: 'sw', minutes: 15, note: 'Kurze Instruktion', at: at(12 * D - 2 * H) }],
     },
     {
       number: 1029,
@@ -348,13 +332,12 @@ export function buildSeed(): Rec[] {
       firstResponseAt: at(9 * D - H),
       resolvedAt: at(8 * D),
       closedAt: at(8 * D - 2 * H),
-      billing: 'verrechenbar',
       events: [
         { at: at(9 * D), kind: 'created', actor: cust('p-keller'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(8 * D), kind: 'reply_agent', actor: ag('rw'), public: true, text: 'Lösung: Zeitwirtschaft → Periodenabschluss → Monat wählen → «Abschliessen». Nachbuchungen sind danach nur noch mit Admin-Recht möglich.' },
         { at: at(8 * D - 2 * H), kind: 'feedback', actor: cust('p-keller'), public: true, text: 'Kundin ist mit der Lösung einverstanden – Ticket geschlossen.' },
       ],
-      time: [{ agentId: 'rw', minutes: 60, note: 'Schulung Periodenabschluss per Teams', at: at(8 * D), billable: true }],
+      time: [{ agentId: 'rw', minutes: 60, note: 'Schulung Periodenabschluss per Teams', at: at(8 * D) }],
     },
     {
       number: 1021,
@@ -373,13 +356,12 @@ export function buildSeed(): Rec[] {
       firstResponseAt: at(18 * D - 2 * H),
       resolvedAt: at(16 * D),
       closedAt: at(15 * D),
-      billing: 'verrechenbar',
       events: [
         { at: at(18 * D), kind: 'created', actor: cust('p-brunner'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(16 * D), kind: 'reply_agent', actor: ag('jg'), public: true, text: 'Lösung: Die 10 Lizenzen sind freigeschaltet und in Ihrer Lizenzübersicht sichtbar.' },
         { at: at(15 * D), kind: 'feedback', actor: cust('p-brunner'), public: true, text: 'Kundin ist mit der Lösung einverstanden – Ticket geschlossen.' },
       ],
-      time: [{ agentId: 'jg', minutes: 30, note: 'Lizenzen freigeschaltet', at: at(16 * D), billable: true }],
+      time: [{ agentId: 'jg', minutes: 30, note: 'Lizenzen freigeschaltet', at: at(16 * D) }],
     },
     {
       number: 1018,
@@ -398,13 +380,12 @@ export function buildSeed(): Rec[] {
       firstResponseAt: at(34 * D - 3 * H),
       resolvedAt: at(30 * D),
       closedAt: at(29 * D),
-      billing: 'uebermittelt',
       events: [
         { at: at(34 * D), kind: 'created', actor: cust('p-brunner'), public: true, via: 'portal', text: 'Ticket über das Kundenportal erfasst.' },
         { at: at(30 * D), kind: 'reply_agent', actor: ag('rw'), public: true, text: 'Lösung: Das Exportprofil «Lohn» verwendet neu das Format JJJJ-MM-TT.' },
         { at: at(29 * D), kind: 'feedback', actor: cust('p-brunner'), public: true, text: 'Kundin ist mit der Lösung einverstanden – Ticket geschlossen.' },
       ],
-      time: [{ agentId: 'rw', minutes: 120, note: 'Exportprofil angepasst und getestet', at: at(30 * D), billable: true }],
+      time: [{ agentId: 'rw', minutes: 120, note: 'Exportprofil angepasst und getestet', at: at(30 * D) }],
     },
   ]
 
@@ -427,7 +408,7 @@ export function buildSeed(): Rec[] {
     }
     for (const te of time) {
       const tid = sid('time')
-      recs.push({ id: tid, kind: 'time', data: { ...te, id: tid, ticketId: id, rate: rateOf(s.customerId) } satisfies TimeEntry })
+      recs.push({ id: tid, kind: 'time', data: { ...te, id: tid, ticketId: id } satisfies TimeEntry })
     }
   }
 
@@ -471,7 +452,7 @@ export function buildSeed(): Rec[] {
 
   for (const l of buildLegacySeed()) recs.push({ id: 'legacy-' + l.id, kind: 'legacy', data: l })
 
-  recs.push({ id: 'meta', kind: 'meta', data: { seededAt: new Date().toISOString(), version: 1 } })
+  recs.push({ id: 'meta', kind: 'meta', data: { seededAt: new Date().toISOString(), version: 2 } })
   return recs
 }
 

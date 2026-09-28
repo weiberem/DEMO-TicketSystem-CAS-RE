@@ -5,7 +5,6 @@ export type RequestType = 'incident' | 'problem' | 'bug' | 'service' | 'frage' |
 export type Status = 'neu' | 'in_arbeit' | 'warten_kunde' | 'second_level' | 'geloest' | 'geschlossen'
 export type Channel = 'portal' | 'email' | 'telefon'
 export type Team = 'first' | 'second'
-export type BillingStatus = 'offen' | 'verrechenbar' | 'nicht_verrechenbar' | 'uebermittelt'
 
 export interface Attachment {
   name: string
@@ -16,7 +15,6 @@ export interface Customer {
   id: string
   nr: string
   name: string
-  rate: number // CHF pro Stunde
   contract: string
   city: string
 }
@@ -65,7 +63,6 @@ export interface Ticket {
   firstResponseAt?: string
   resolvedAt?: string
   closedAt?: string
-  billing: BillingStatus
   reopenedCount: number
   customerUpdate?: boolean // neue Kundenaktivität, noch nicht gesehen
   createdByAgentId?: string
@@ -112,8 +109,6 @@ export interface TimeEntry {
   minutes: number
   note: string
   at: string
-  billable: boolean
-  rate: number
 }
 
 export interface Email {

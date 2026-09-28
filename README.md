@@ -12,7 +12,7 @@ eskalieren, lösen, bestätigen, wiedereröffnen …). Alle Namen, Kunden und Ti
 | **Ist** · Kontaktformular | `/ist/formular` | 2 (Sebi) | Öffentliches 3-Schritte-Formular, Freitext, keine Ticketnummer, simulierter Datenverlust |
 | **Ist** · WISE Enterprise Portal | `/ist/wise` | 4 (Nicole · Livia) | Ticket #24482: Re-Open, Mail-Verlauf, CHF 180 manuell, Status für Buchhaltung, Shift Manager 39 s |
 | **Soll** · Kundenportal | `/portal` | 10 / 14 (Rémy) | HR-Login, strukturierte Erfassung, SLA/Telefon-Hinweis, Eingangsbestätigung, Status & Verlauf, Lösung bestätigen |
-| **Soll** · Agenten-Queue | `/desk` | 10 / 15 (Rémy) | Queues, SLA-Uhr, Zuweisung, Eskalation, @-Markierung, Zeiterfassung mit Tarif, Use Case 03, Reports, Leistungsdaten |
+| **Soll** · Agenten-Queue | `/desk` | 10 / 15 (Rémy) | Queues, SLA-Uhr, Zuweisung, Eskalation, @-Markierung, Zeiterfassung, Use Case 03, Reports zu Zeit und SLA |
 | Vergleich | `/vergleich` | – | 8 Szenarien Ist vs. Soll mit Direktlinks |
 | Split-Screen | `/split?l=…&r=…` | – | Zwei Mockups nebeneinander (live synchron) |
 
@@ -20,7 +20,10 @@ eskalieren, lösen, bestätigen, wiedereröffnen …). Alle Namen, Kunden und Ti
 rot im Ist-System, grün dort, wo der Soll-Prozess sie löst.
 
 Nützliche Deep-Links: `/portal?as=p-brunner` (Monika Brunner, Bühler AG), `/portal/ticket/TS-1033?as=p-keller`
-(Lösung bestätigen), `/desk/ticket/TS-1034` (Sebi-Sport, Tarif CHF 180).
+(Lösung bestätigen), `/desk/ticket/TS-1034` (Sebi-Sport).
+
+**Abgrenzung:** Verrechnung und Stundensätze sind bewusst out of scope und im Soll-Prototyp nicht enthalten.
+Das Ist-Mockup (WISE) zeigt den heutigen Ablauf von Folie 4 unverändert.
 
 ## Lokal starten
 

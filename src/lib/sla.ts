@@ -79,10 +79,6 @@ export function fmtRelative(iso: string, now = Date.now()): string {
   return fmtDate(iso)
 }
 
-export function fmtCHF(v: number): string {
-  return `CHF ${v.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
 export function fmtHours(minutes: number): string {
   const h = minutes / 60
   return `${h.toLocaleString('de-CH', { maximumFractionDigits: 2 })} h`

@@ -21,9 +21,9 @@ import {
   updateFields,
 } from '../lib/actions'
 import { useData } from '../lib/store'
-import { fmtCHF, fmtDateTime, fmtHours, fmtRelative, slaState } from '../lib/sla'
+import { fmtDateTime, fmtHours, fmtRelative, slaState } from '../lib/sla'
 import { Avatar, DiffNote, Modal, PP, fakeFiles, toast, useNow } from '../components/ui'
-import { Attachments, BillingLozenge, SlaLabel } from '../components/ticketbits'
+import { Attachments, SlaLabel } from '../components/ticketbits'
 import { useAgent } from './Desk'
 
 type Tab = 'alle' | 'kommunikation' | 'intern' | 'verlauf'
@@ -50,8 +50,6 @@ export default function DeskTicket() {
   const customer = getCustomer(t.customerId)!
   const contact = contactById(t.contactId)
   const minutes = time.reduce((s, x) => s + x.minutes, 0)
-  const billableMin = time.filter((x) => x.billable).reduce((s, x) => s + x.minutes, 0)
-  const amount = time.filter((x) => x.billable).reduce((s, x) => s + (x.minutes / 60) * x.rate, 0)
   const open = t.status !== 'geloest' && t.status !== 'geschlossen'
   const shown = events.filter((e) =>
     tab === 'alle' ? true : tab === 'kommunikation' ? e.kind === 'reply_agent' || e.kind === 'reply_customer' || e.kind === 'feedback' || e.kind === 'created' : tab === 'intern' ? e.kind === 'note' || e.kind === 'escalate' : !['reply_agent', 'reply_customer', 'note'].includes(e.kind),
@@ -263,17 +261,9 @@ export default function DeskTicket() {
                 <span className="text-subtle">Vertrag:</span> {customer.contract}
               </span>
             </div>
-            <div className={`mt-2 flex items-center justify-between rounded px-3 py-2 text-[13px] ${customer.rate !== 200 ? 'bg-[#FFFAE6]' : 'bg-[#F4F5F7]'}`}>
-              <span>
-                <span className="text-subtle">Stundensatz:</span> <b>CHF {customer.rate}.–/h</b> {customer.rate !== 200 && <span className="text-[#974F0C]">(Spezialtarif)</span>}
-              </span>
-              <Link to="/desk/kunden" className="text-[12px] text-[#0052CC] hover:underline">
-                Tariftabelle
-              </Link>
-            </div>
           </Panel>
 
-          <TimePanel t={t} agentId={agent.id} minutes={minutes} billableMin={billableMin} amount={amount} entries={time} />
+          <TimePanel t={t} agentId={agent.id} minutes={minutes} entries={time} />
         </aside>
       </div>
 
@@ -480,39 +470,23 @@ function AgentEvent({ e }: { e: TicketEvent }) {
   )
 }
 
-function TimePanel({ t, agentId, minutes, billableMin, amount, entries }: { t: Ticket; agentId: string; minutes: number; billableMin: number; amount: number; entries: ReturnType<typeof getTimeEntries> }) {
+function TimePanel({ t, agentId, minutes, entries }: { t: Ticket; agentId: string; minutes: number; entries: ReturnType<typeof getTimeEntries> }) {
   const [min, setMin] = useState(15)
   const [note, setNote] = useState('')
-  const [billable, setBillable] = useState(true)
-  const customer = getCustomer(t.customerId)!
   const add = () => {
     if (!note.trim() || min <= 0) {
       toast('Bitte Dauer und Tätigkeit angeben.', 'warn')
       return
     }
-    logTime(t, agentId, min, note.trim(), billable)
+    logTime(t, agentId, min, note.trim())
     setNote('')
-    toast(`${min} Min erfasst${billable ? ` – verrechnet zu CHF ${customer.rate}.–/h` : ''}.`, 'success')
+    toast(`${min} Min erfasst.`, 'success')
   }
   return (
-    <Panel title="Zeiterfassung & Verrechnung" extra={<PP ids={['PP16']} />}>
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="rounded bg-[#F4F5F7] py-2">
-          <div className="text-[16px] font-semibold">{fmtHours(minutes)}</div>
-          <div className="text-[11px] text-subtle">erfasst</div>
-        </div>
-        <div className="rounded bg-[#F4F5F7] py-2">
-          <div className="text-[16px] font-semibold">{fmtHours(billableMin)}</div>
-          <div className="text-[11px] text-subtle">verrechenbar</div>
-        </div>
-        <div className="rounded bg-[#E3FCEF] py-2">
-          <div className="text-[15px] font-semibold text-[#006644]">{fmtCHF(amount)}</div>
-          <div className="text-[11px] text-subtle">Leistungswert</div>
-        </div>
-      </div>
-      <div className="mt-2 flex items-center justify-between text-[12.5px]">
-        <span className="text-subtle">Verrechnungsstatus</span>
-        <BillingLozenge billing={t.billing} />
+    <Panel title="Zeiterfassung">
+      <div className="flex items-baseline justify-between rounded bg-[#F4F5F7] px-3 py-2">
+        <span className="text-[12.5px] text-subtle">Zeitaufwand total</span>
+        <span className="text-[17px] font-semibold">{fmtHours(minutes)}</span>
       </div>
       {entries.length > 0 && (
         <div className="mt-3 max-h-40 space-y-1 overflow-y-auto">
@@ -523,7 +497,6 @@ function TimePanel({ t, agentId, minutes, billableMin, amount, entries }: { t: T
                 {x.note}
               </span>
               <span className="text-subtle">{x.minutes} Min</span>
-              {!x.billable && <span className="text-[10.5px] text-[#BF2600]">n.v.</span>}
             </div>
           ))}
         </div>
@@ -536,19 +509,13 @@ function TimePanel({ t, agentId, minutes, billableMin, amount, entries }: { t: T
             </button>
           ))}
         </div>
-        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Tätigkeit (Verrechnungsgrund)" spellCheck className="mb-2 w-full rounded-[3px] border-2 border-line px-2.5 py-1.5 text-[13px] outline-none focus:border-[#4C9AFF]" />
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-1.5 text-[12.5px]">
-            <input type="checkbox" checked={billable} onChange={(e) => setBillable(e.target.checked)} /> verrechenbar
-          </label>
-          <span className="flex-1 text-right text-[12px] text-subtle">Tarif automatisch: CHF {customer.rate}.–/h</span>
+        <div className="flex gap-2">
+          <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Tätigkeit" spellCheck className="min-w-0 flex-1 rounded-[3px] border-2 border-line px-2.5 py-1.5 text-[13px] outline-none focus:border-[#4C9AFF]" />
           <button onClick={add} className="rounded-[3px] bg-[#F4F5F7] px-3 py-1 text-[13px] font-medium hover:bg-[#EBECF0]">
             Erfassen
           </button>
         </div>
-        <DiffNote kind="fix" ids={['PP16']} className="mt-3">
-          Heute wird der Stundensatz (z. B. CHF 180 statt 200 bei Sebi-Sport) von Hand eingetippt. Neu kommt er aus der hinterlegten Tariftabelle pro Kunde.
-        </DiffNote>
+        <p className="mt-2 text-[11.5px] text-subtle">Zeitaufwand pro Ticket, Mitarbeitende und Kunde auswertbar. Verrechnung und Stundensätze sind nicht Teil des Prototyps.</p>
       </div>
     </Panel>
   )
@@ -620,31 +587,27 @@ function BackModal({ t, agentId, onClose }: { t: Ticket; agentId: string; onClos
 }
 
 function ResolveModal({ t, agentId, minutes, onClose }: { t: Ticket; agentId: string; minutes: number; onClose: () => void }) {
-  const customer = getCustomer(t.customerId)!
   const contact = contactById(t.contactId)
   const [solution, setSolution] = useState('')
   const [addMin, setAddMin] = useState(minutes === 0 ? 30 : 0)
-  const [addNote, setAddNote] = useState(minutes === 0 ? '' : '')
-  const [billing, setBilling] = useState<'verrechenbar' | 'nicht_verrechenbar'>('verrechenbar')
-  const entries = getTimeEntries(t.id)
-  const billableMin = entries.filter((e) => e.billable).reduce((s, e) => s + e.minutes, 0) + (billing === 'verrechenbar' ? addMin : 0)
+  const [addNote, setAddNote] = useState('')
   const total = minutes + addMin
   const needTime = total === 0
   const valid = solution.trim().length >= 5 && !needTime && (addMin === 0 || addNote.trim().length > 0)
 
   const submit = () => {
-    if (addMin > 0) logTime(t, agentId, addMin, addNote.trim(), billing === 'verrechenbar')
-    resolveTicket(t, agentId, solution.trim(), billing)
+    if (addMin > 0) logTime(t, agentId, addMin, addNote.trim())
+    resolveTicket(t, agentId, solution.trim())
     toast(`${t.key} gelöst – ${contact?.name} wird um Bestätigung gebeten.`, 'success')
     onClose()
   }
 
   return (
-    <Modal title={`Use Case 03 · Ticket ${t.key} lösen`} onClose={onClose} width={640}>
+    <Modal title={`Use Case 03 · Ticket ${t.key} lösen`} onClose={onClose} width={620}>
       <ol className="mb-4 grid grid-cols-3 gap-2 text-center text-[11.5px] font-semibold text-subtle">
         <li className="rounded bg-[#DEEBFF] py-1.5 text-[#0747A6]">1 · Lösung an Kunde</li>
         <li className="rounded bg-[#DEEBFF] py-1.5 text-[#0747A6]">2 · Zeitaufwand erfasst</li>
-        <li className="rounded bg-[#DEEBFF] py-1.5 text-[#0747A6]">3 · Status für Buchhaltung</li>
+        <li className="rounded bg-[#DEEBFF] py-1.5 text-[#0747A6]">3 · Kunde bestätigt</li>
       </ol>
       <label className="mb-1 block text-[13px] font-semibold text-[#42526E]">
         Lösung (wird an {contact?.name} gesendet) <span className="text-[#DE350B]">*</span>
@@ -661,38 +624,15 @@ function ResolveModal({ t, agentId, minutes, onClose }: { t: Ticket; agentId: st
           <span className="text-[13px] text-subtle">Min zusätzlich</span>
           <input value={addNote} onChange={(e) => setAddNote(e.target.value)} placeholder="Tätigkeit" className="min-w-[160px] flex-1 rounded-[3px] border-2 border-line bg-white px-2.5 py-1.5 text-[14px]" />
         </div>
-        {needTime && <p className="mt-1.5 text-[12px] text-[#DE350B]">Ohne erfassten Zeitaufwand kann das Ticket nicht gelöst werden.</p>}
+        {needTime ? (
+          <p className="mt-1.5 text-[12px] text-[#DE350B]">Ohne erfassten Zeitaufwand kann das Ticket nicht gelöst werden.</p>
+        ) : (
+          <p className="mt-1.5 text-[12px] text-subtle">Total inkl. neu: {fmtHours(total)}</p>
+        )}
       </div>
 
-      <div className="mt-4">
-        <div className="mb-1.5 text-[13px] font-semibold text-[#42526E]">Status für Buchhaltung</div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {(
-            [
-              ['verrechenbar', 'Verrechenbar', `Leistung nach Kundentarif`],
-              ['nicht_verrechenbar', 'Nicht verrechenbar', 'Kulanz, Garantie, Fehler TimeTool'],
-            ] as const
-          ).map(([v, l, d]) => (
-            <label key={v} className={`flex cursor-pointer gap-2 rounded-md border-2 p-2.5 ${billing === v ? 'border-[#0052CC] bg-[#F4F8FF]' : 'border-line'}`}>
-              <input type="radio" checked={billing === v} onChange={() => setBilling(v)} className="mt-0.5" />
-              <span>
-                <span className="block text-[14px] font-semibold">{l}</span>
-                <span className="text-[12px] text-subtle">{d}</span>
-              </span>
-            </label>
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-between rounded-md bg-[#E3FCEF] px-3 py-2.5 text-[13.5px] text-[#006644]">
-          <span>
-            {fmtHours(billableMin)} × CHF {customer.rate}.–/h <span className="opacity-75">({customer.name}, {customer.contract})</span>
-          </span>
-          <b>{fmtCHF((billableMin / 60) * customer.rate)}</b>
-        </div>
-        <p className="mt-1 text-[12px] text-subtle">Total erfasst inkl. neu: {fmtHours(total)}. Nach Bestätigung durch den Kunden stehen die Leistungsdaten der Buchhaltung zur Verfügung (Schnittstelle).</p>
-      </div>
-
-      <DiffNote kind="fix" ids={['PP12', 'PP16']} className="mt-4">
-        Heute: Zeit erfassen, Stundensatz manuell anpassen, Status «Closed, unbilled» setzen – ohne Rückmeldung des Kunden. Neu: Tarif automatisch, Buchhaltungsstatus gesetzt, Kunde bestätigt (sonst Wiedereröffnung).
+      <DiffNote kind="fix" ids={['PP12']} className="mt-4">
+        Heute wird das Ticket per Status geschlossen – ohne Rückmeldung des Kunden. Neu erhält der Kunde die Lösung und bestätigt sie im Portal; ist er nicht einverstanden, wird das Ticket automatisch wiedereröffnet.
       </DiffNote>
 
       <div className="mt-4 flex justify-end gap-2">

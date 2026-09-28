@@ -3,7 +3,6 @@ import type {
   Actor,
   AgentStatus,
   Attachment,
-  BillingStatus,
   Channel,
   Customer,
   Email,
@@ -127,7 +126,6 @@ export async function createTicket(input: NewTicketInput): Promise<Ticket> {
       assigneeId: null,
       createdAt: ts,
       updatedAt: ts,
-      billing: 'offen',
       reopenedCount: 0,
     }
     if (await store.insertUnique({ id: key, kind: 'ticket', data: t })) break
@@ -260,25 +258,23 @@ export function updateFields(t: Ticket, agentId: string, patch: Partial<Pick<Tic
   store.putMany(recs)
 }
 
-export function logTime(t: Ticket, agentId: string, minutes: number, note: string, billable: boolean) {
-  const rate = getCustomer(t.customerId)?.rate ?? 200
+export function logTime(t: Ticket, agentId: string, minutes: number, note: string) {
   const id = uid('time')
-  const te: TimeEntry = { id, ticketId: t.id, agentId, minutes, note, at: now(), billable, rate }
+  const te: TimeEntry = { id, ticketId: t.id, agentId, minutes, note, at: now() }
   store.putMany([
     { id, kind: 'time', data: te },
-    ev(t.id, 'time', agentActor(agentId), `Zeitaufwand erfasst: ${minutes} Min${billable ? ` à CHF ${rate}.–/h (Kundentarif)` : ' (nicht verrechenbar)'} – ${note}`, false),
+    ev(t.id, 'time', agentActor(agentId), `Zeitaufwand erfasst: ${minutes} Min – ${note}`, false),
   ])
 }
 
-/** Use Case 03 – Ticket schliessen: Lösung an Kunde, Zeitaufwand erfasst, Status für Buchhaltung gesetzt. */
-export function resolveTicket(t: Ticket, agentId: string, solution: string, billing: BillingStatus) {
+/** Use Case 03 – Ticket schliessen: Lösung an Kunde, Zeitaufwand erfasst, Kunde bestätigt. */
+export function resolveTicket(t: Ticket, agentId: string, solution: string) {
   const recs: Rec[] = []
-  const nt: Ticket = { ...t, status: 'geloest', resolvedAt: now(), billing, customerUpdate: false }
+  const nt: Ticket = { ...t, status: 'geloest', resolvedAt: now(), customerUpdate: false }
   if (!nt.firstResponseAt) nt.firstResponseAt = now()
   if (!nt.assigneeId) nt.assigneeId = agentId
   recs.push(ev(t.id, 'reply_agent', agentActor(agentId), `Lösung: ${solution}`, true))
   recs.push(ev(t.id, 'status', agentActor(agentId), `${statusText(t.status, 'geloest')} (wartet auf Bestätigung durch Kunde)`, true))
-  recs.push(ev(t.id, 'system', agentActor(agentId), `Verrechnungsstatus für Buchhaltung: ${billing === 'verrechenbar' ? 'Verrechenbar' : 'Nicht verrechenbar'}`, false))
   recs.push(
     mail(
       t.contactId,
@@ -334,7 +330,6 @@ export function customerFeedback(t: Ticket, contactId: string, accepted: boolean
   if (accepted) {
     recs.push(ev(t.id, 'feedback', contactActor(contactId), `Kunde ist mit der Lösung einverstanden – Ticket geschlossen.${comment ? `\n«${comment}»` : ''}`, true))
     recs.push(ev(t.id, 'status', systemActor, statusText('geloest', 'geschlossen'), true))
-    recs.push(ev(t.id, 'system', systemActor, 'Leistungsdaten (Zeitaufwand × Kundentarif) stehen für die Stundenabrechnung der Buchhaltung bereit.', false))
     if (t.assigneeId) recs.push(notif(t.assigneeId, `${t.key}: Kunde hat die Lösung bestätigt`, t.key))
     recs.push(tRec({ ...t, status: 'geschlossen', closedAt: now() }))
   } else {
@@ -352,7 +347,7 @@ export function markSeen(t: Ticket) {
 }
 
 // ---------------------------------------------------------------------------
-// Verwaltung, Benachrichtigungen, Leistungsdaten
+// Verwaltung, Benachrichtigungen
 // ---------------------------------------------------------------------------
 
 export function setNotificationRead(n: Notification, agentId: string, read: boolean) {
@@ -369,21 +364,6 @@ export function markAllRead(agentId: string) {
 
 export function setAbsent(agentId: string, absent: boolean, absentNote?: string) {
   store.put('agentstatus', 'status-' + agentId, { id: agentId, absent, absentNote } satisfies AgentStatus)
-}
-
-export function updateCustomer(c: Customer) {
-  store.put('customer', c.id, c)
-}
-
-export function transmitToAccounting(ticketIds: string[]) {
-  const recs: Rec[] = []
-  for (const id of ticketIds) {
-    const t = getTicket(id)
-    if (!t) continue
-    recs.push(tRec({ ...t, billing: 'uebermittelt' }))
-    recs.push(ev(t.id, 'system', systemActor, 'Leistungsdaten an Buchhaltung übermittelt (Schnittstelle).', false))
-  }
-  store.putMany(recs)
 }
 
 export const allAgents = () => AGENTS
